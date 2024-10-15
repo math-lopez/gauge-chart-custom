@@ -96,7 +96,6 @@
 //   dominant-baseline: middle;
 //   text-anchor: middle;
 // }
-
 .gauge-container {
   display: flex;
   flex-direction: column;
@@ -109,13 +108,6 @@
   margin-bottom: 20px;
 }
 
-svg {
-  display: block;
-  margin: auto;
-}
-
-text {
-  font-family: Arial, sans-serif;
-  dominant-baseline: middle;
-  text-anchor: middle;
+.gauge-segment {
+  transition: stroke 0.5s ease;
 }

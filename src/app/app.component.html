@@ -11,9 +11,9 @@
   />
 
   <!-- SVG do Gauge Chart Semi-Círculo com Quatro Segmentos -->
-  <svg [attr.width]="radius * 2 + 50" height="500">
-    <g [attr.transform]="'translate(' + (radius + 25) + ',' + (radius + 25) + ')'">
-      <!-- Desenhar cada segmento -->
+  <svg [attr.width]="radius * 2 + 100" [attr.height]="radius + 100">
+    <!-- Ajuste o transform para centralizar o gráfico -->
+    <g [attr.transform]="'translate(' + (radius + 50) + ',' + (radius + 50) + ')'">
       <ng-container *ngFor="let segment of segments; let i = index">
         <path
           [attr.d]="describeArc(
@@ -22,24 +22,26 @@
             radius
           )"
           [attr.stroke]="segment.color"
-          stroke-width="15"
+          stroke-width="12"
+          stroke-linecap="round"
           fill="none"
+          class="gauge-segment"
         ></path>
       </ng-container>
     </g>
 
     <!-- Texto do Valor -->
     <text
-      [attr.x]="radius + 25"
-      [attr.y]="radius + 25"
+      [attr.x]="radius + 50"
+      [attr.y]="radius + 60"
       text-anchor="middle"
       dominant-baseline="middle"
       [attr.fill]="'#2e3a59'"
       [style.fontSize.px]="40"
     >{{ value }}</text>
     <text
-      [attr.x]="radius + 25"
-      [attr.y]="radius + 50"
+      [attr.x]="radius + 50"
+      [attr.y]="radius + 90"
       text-anchor="middle"
       dominant-baseline="middle"
       [attr.fill]="'#6c757d'"
