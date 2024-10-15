@@ -15,10 +15,10 @@ export class AppComponent implements OnInit {
   value: number = 250;
 
   segments: Segment[] = [
-    { id: 1, value: 0, color: '#ff4e42', fillPercentage: 0 }, // Vermelho
-    { id: 2, value: 0, color: '#ffa500', fillPercentage: 0 }, // Amarelo
-    { id: 3, value: 0, color: '#00ff00', fillPercentage: 0 }, // Verde Claro
-    { id: 4, value: 0, color: '#00b050', fillPercentage: 0 }  // Verde Escuro
+    { id: 1, value: 0, color: '#ddd', fillPercentage: 0 },
+    { id: 2, value: 0, color: '#ddd', fillPercentage: 0 },
+    { id: 3, value: 0, color: '#ddd', fillPercentage: 0 },
+    { id: 4, value: 0, color: '#ddd', fillPercentage: 0 }
   ];
 
   // Parâmetros do círculo
