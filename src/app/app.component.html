@@ -15,6 +15,23 @@
     <!-- Ajuste o transform para centralizar o gráfico -->
     <g [attr.transform]="'translate(' + (radius + 50) + ',' + (radius + 50) + ')'">
       <ng-container *ngFor="let segment of segments; let i = index">
+        <!-- Caminho de Fundo em Cinza -->
+        <path
+          [attr.d]="describeArc(
+            (segmentAngle + segmentSpacing) * i + initialOffset,
+            segmentAngle,
+            radius
+          )"
+          stroke="#d3d3d3"
+          stroke-width="12"
+          stroke-linecap="round"
+          fill="none"
+          class="gauge-segment-bg"
+          pathLength="100"
+          stroke-dasharray="100, 100"
+        ></path>
+
+        <!-- Caminho de Preenchimento com Cor -->
         <path
           [attr.d]="describeArc(
             (segmentAngle + segmentSpacing) * i + initialOffset,
@@ -26,6 +43,8 @@
           stroke-linecap="round"
           fill="none"
           class="gauge-segment"
+          pathLength="100"
+          [attr.stroke-dasharray]="segment.fillPercentage + ', 100'"
         ></path>
       </ng-container>
     </g>
@@ -33,7 +52,7 @@
     <!-- Texto do Valor -->
     <text
       [attr.x]="radius + 50"
-      [attr.y]="radius + 60"
+      [attr.y]="radius + 30"
       text-anchor="middle"
       dominant-baseline="middle"
       [attr.fill]="'#2e3a59'"
@@ -41,11 +60,14 @@
     >{{ value }}</text>
     <text
       [attr.x]="radius + 50"
-      [attr.y]="radius + 90"
+      [attr.y]="radius + 60"
       text-anchor="middle"
       dominant-baseline="middle"
       [attr.fill]="'#6c757d'"
       [style.fontSize.px]="14"
     >de 1000</text>
   </svg>
+
+  <!-- Botão para Teste (Opcional) -->
+  <button (click)="updateChart('btn')">Atualizar Chart</button>
 </div>
