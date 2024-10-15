@@ -1,0 +1,16 @@
+.gauge-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .slider {
+    width: 80%;
+    margin-bottom: 20px;
+  }
+  
+  .gauge-segment, .gauge-segment-bg {
+    transition: stroke-dasharray 0.9s ease, stroke 0.5s ease;
+  }
+  
