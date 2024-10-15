@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./gauge-chart.component.scss']
 })
 export class GaugeChartComponent {
- 
+
   @Input() valueScore: number = 250;
   @Input() useDarkGrayOutline: boolean = true;
   displayValue: number = 250;
@@ -23,7 +23,6 @@ export class GaugeChartComponent {
     { id: 4, value: 0, color: '#00b050', fillPercentage: 0, angle: 55, spacing: 0 }
   ];
 
-  // Parâmetros do círculo
   radius: number = 125;
   initialOffset: number = 180;
   segmentStartAngles: number[] = [];
@@ -62,11 +61,10 @@ export class GaugeChartComponent {
 
     this.displayValue = clampedValue;
 
-    // Definição dos limites de cada segmento
-    const thresholdForRed = 300;        // Limite para o vermelho (0 a 300)
-    const thresholdForYellow = 500;     // Limite para o amarelo (301 a 500)
-    const thresholdForFirstGreen = 700; // Limite para o verde claro (501 a 700)
-    const thresholdForLastGreen = 1000; // Limite para o verde escuro (701 a 1000)
+    const thresholdForRed = 300;
+    const thresholdForYellow = 500;
+    const thresholdForFirstGreen = 700;
+    const thresholdForLastGreen = 1000;
 
     for (let i = 0; i < this.segments.length; i++) {
       let fillPercentage = 0;
@@ -120,27 +118,29 @@ export class GaugeChartComponent {
 
       this.segments[i].fillPercentage = fillPercentage;
 
-      if (this.segments[i].value > 0) {
-        this.segments[i].color = this.useDarkGrayOutline ? '#A9A9A9' : this.getColor(i);
-      } else {
-        this.segments[i].color = '#d3d3d3';
-      }
+      // Verifica se deve aplicar o cinza escuro ou o gradiente
+      this.segments[i].color = this.useDarkGrayOutline ? '#A9A9A9' : this.getGradient(i);
     }
   }
-  
-  getColor(index: number): string {
-    if (index === 2 && this.currentScore >= 501) {
-      return '#00ff00';
-    } else if (index === 3 && this.currentScore >= 701) {
-      return '#00b050';
-    } else if (index === 1 && this.currentScore >= 301) {
-      return '#ffa500';
-    } else if (index === 0 && this.currentScore <= 300) {
-      return '#ff4e42';
-    } else if (index === 0 && this.currentScore > 300) {
-      return '#ff4e42';
+
+  // Método para obter o gradiente ou o cinza escuro
+  getGradient(index: number): string {
+    if (this.useDarkGrayOutline) {
+      return '#A9A9A9';  // Aplica cinza escuro a todos os segmentos
     }
-    return '#d3d3d3';
+
+    // Aplica os gradientes normais se o modo cinza escuro não estiver ativado
+    if (index === 0) {
+      return 'url(#redToYellow)';
+    } else if (index === 1) {
+      return 'url(#yellowToGreen)';
+    } else if (index === 2) {
+      return 'url(#greenToDarkGreen)';
+    } else if (index === 3) {
+      return 'url(#darkGreenToBlack)';
+    } else {
+      return this.segments[index].color;  // Cor sólida para o último segmento
+    }
   }
 
   describeArc(startAngle: number, angleSpan: number, radius: number): string {
@@ -176,7 +176,6 @@ export class GaugeChartComponent {
       const progress = Math.min(elapsed / duration, 1);
       this.currentScore = Math.round(initialValue + difference * this.easeOutCubic(progress));
 
-      // Atualiza o valor exibido e o gráfico
       this.displayValue = this.currentScore;
       this.updateChart();  
 

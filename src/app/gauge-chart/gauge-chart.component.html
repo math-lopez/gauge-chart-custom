@@ -1,7 +1,45 @@
 <div class="gauge-container">
     <svg [attr.width]="radius * 2 + 100" [attr.height]="radius + 100">
+      <!-- Definir gradientes -->
+      <defs>
+        <!-- Gradiente do Vermelho para o Amarelo com transições suaves -->
+        <linearGradient id="redToYellow" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#ff4e42;stop-opacity:1" /> <!-- Vermelho -->
+          <stop offset="40%" style="stop-color:#ff6347;stop-opacity:1" /> <!-- Tom intermediário -->
+          <stop offset="70%" style="stop-color:#ffbb3e;stop-opacity:1" /> <!-- Tom intermediário -->
+          <stop offset="100%" style="stop-color:#ffa500;stop-opacity:1" /> <!-- Amarelo -->
+        </linearGradient>
+      
+        <!-- Gradiente do Amarelo para o Verde Claro com transições suaves -->
+        <linearGradient id="yellowToGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#ffa500;stop-opacity:1" /> <!-- Amarelo -->
+          <stop offset="30%" style="stop-color:#ffd900;stop-opacity:1" /> <!-- Tom intermediário -->
+          <stop offset="60%" style="stop-color:#6fff00;stop-opacity:1" /> <!-- Tom intermediário -->
+          <stop offset="100%" style="stop-color:#00ff00;stop-opacity:1" /> <!-- Verde Claro -->
+        </linearGradient>
+      
+        <!-- Gradiente do Verde Claro para o Verde Escuro com transições suaves -->
+        <linearGradient id="greenToDarkGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#00ff00;stop-opacity:1" /> <!-- Verde Claro -->
+          <stop offset="40%" style="stop-color:#00e000;stop-opacity:1" /> <!-- Tom intermediário -->
+          <stop offset="80%" style="stop-color:#00b050;stop-opacity:1" /> <!-- Verde intermediário escuro -->
+          <stop offset="100%" style="stop-color:#008b45;stop-opacity:1" /> <!-- Verde Escuro -->
+        </linearGradient>
+      
+        <!-- Gradiente do Verde Escuro para Preto com transições suaves (para o último segmento) -->
+        <linearGradient id="darkGreenToBlack" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#008b45;stop-opacity:1" /> <!-- Verde Escuro -->
+          <stop offset="50%" style="stop-color:#006400;stop-opacity:1" /> <!-- Verde ainda mais escuro -->
+          <stop offset="80%" style="stop-color:#004000;stop-opacity:1" /> <!-- Verde muito escuro -->
+          <stop offset="100%" style="stop-color:#000000;stop-opacity:1" /> <!-- Preto -->
+        </linearGradient>
+      </defs>
+      
+
+      <!-- Gráfico com gradientes -->
       <g [attr.transform]="'translate(' + (radius + 50) + ',' + (radius + 50) + ')'">
         <ng-container *ngFor="let segment of segments; let i = index">
+          <!-- Caminho de Fundo em Cinza -->
           <path
             [attr.d]="describeArc(
               segmentStartAngles[i],
@@ -17,13 +55,14 @@
             stroke-dasharray="100, 100"
           ></path>
   
+          <!-- Caminho de Preenchimento com Gradiente ou Cinza -->
           <path
             [attr.d]="describeArc(
               segmentStartAngles[i],
               segment.angle,
               radius
             )"
-            [attr.stroke]="segment.color"
+            [attr.stroke]="segment.fillPercentage > 0 ? getGradient(i) : '#d3d3d3'"
             stroke-width="12"
             stroke-linecap="round"
             fill="none"
@@ -52,4 +91,3 @@
       >de 1000</text>
     </svg>
   </div>
-  
