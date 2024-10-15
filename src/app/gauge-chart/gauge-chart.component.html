@@ -1,15 +1,4 @@
 <div class="gauge-container">
-    <!-- Slider de Entrada -->
-    <input
-      type="range"
-      min="0"
-      max="1000"
-      [(ngModel)]="valueScore"
-      (input)="updateChart()"
-      class="slider"
-      aria-label="Valor do Gauge"
-    />
-  
     <!-- SVG do Gauge Chart Semi-Círculo com Quatro Segmentos -->
     <svg [attr.width]="radius * 2 + 100" [attr.height]="radius + 100">
       <!-- Ajuste o transform para centralizar o gráfico -->
@@ -52,7 +41,7 @@
       <!-- Texto do Valor -->
       <text
         [attr.x]="radius + 50"
-        [attr.y]="radius + 40"
+        [attr.y]="radius"
         text-anchor="middle"
         dominant-baseline="middle"
         [attr.fill]="'#2e3a59'"
@@ -60,7 +49,7 @@
       >{{ displayValue }}</text>
       <text
         [attr.x]="radius + 50"
-        [attr.y]="radius + 65"
+        [attr.y]="radius + 25"
         text-anchor="middle"
         dominant-baseline="middle"
         [attr.fill]="'#6c757d'"

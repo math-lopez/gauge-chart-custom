@@ -7,13 +7,14 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './gauge-chart.component.html',
-  styleUrl: './gauge-chart.component.scss'
+  styleUrls: ['./gauge-chart.component.scss']
 })
 export class GaugeChartComponent {
  
   @Input() valueScore: number = 250;  // Valor vindo de fora
-  displayValue: number = 250;
-  currentScore: number = 0;  // Valor intermediário para animação
+  @Input() useDarkGrayOutline: boolean = true;  // Controla se deve usar cinza escuro
+  displayValue: number = 250;         // Valor mostrado no texto
+  currentScore: number = 0;           // Valor intermediário para animação
 
   segments: Segment[] = [
     { id: 1, value: 0, color: '#ff4e42', fillPercentage: 0, angle: 55, spacing: 6 }, // Vermelho
@@ -58,6 +59,9 @@ export class GaugeChartComponent {
 
   updateChart() {
     const clampedValue = Math.max(0, Math.min(1000, this.currentScore));
+
+    // Atualiza o valor exibido no texto
+    this.displayValue = clampedValue;
 
     // Definição dos limites de cada segmento
     const thresholdForRed = 300;        // Limite para o vermelho (0 a 300)
@@ -121,11 +125,11 @@ export class GaugeChartComponent {
 
       this.segments[i].fillPercentage = fillPercentage;
 
-      // Ajuste de cores conforme o valor
-      if (this.segments[i].value <= 0) {
-        this.segments[i].color = '#d3d3d3'; // Cor para o segmento não preenchido
+      // Ajuste de cores conforme o valor ou se o modo cinza escuro estiver ativado
+      if (this.segments[i].value > 0) {
+        this.segments[i].color = this.useDarkGrayOutline ? '#A9A9A9' : this.getColor(i); // Cor conforme o segmento normal ou outline cinza escuro
       } else {
-        this.segments[i].color = this.getColor(i); // Cor conforme o segmento
+        this.segments[i].color = '#d3d3d3'; // Cor para o segmento não preenchido (cinza claro)
       }
     }
   }
@@ -177,7 +181,10 @@ export class GaugeChartComponent {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
       this.currentScore = Math.round(initialValue + difference * this.easeOutCubic(progress));
-      this.updateChart();  // Atualiza o gráfico conforme o número progride
+
+      // Atualiza o valor exibido e o gráfico
+      this.displayValue = this.currentScore;
+      this.updateChart();  
 
       if (progress < 1) {
         this.animationFrame = requestAnimationFrame(step);
