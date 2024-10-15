@@ -11,16 +11,16 @@ import { FormsModule } from '@angular/forms';
 })
 export class GaugeChartComponent {
  
-  @Input() valueScore: number = 250;  // Valor vindo de fora
-  @Input() useDarkGrayOutline: boolean = true;  // Controla se deve usar cinza escuro
-  displayValue: number = 250;         // Valor mostrado no texto
-  currentScore: number = 0;           // Valor intermediário para animação
+  @Input() valueScore: number = 250;
+  @Input() useDarkGrayOutline: boolean = true;
+  displayValue: number = 250;
+  currentScore: number = 0;
 
   segments: Segment[] = [
-    { id: 1, value: 0, color: '#ff4e42', fillPercentage: 0, angle: 55, spacing: 6 }, // Vermelho
-    { id: 2, value: 0, color: '#ffa500', fillPercentage: 0, angle: 25, spacing: 6 }, // Amarelo
-    { id: 3, value: 0, color: '#00ff00', fillPercentage: 0, angle: 25, spacing: 6 }, // Verde Claro
-    { id: 4, value: 0, color: '#00b050', fillPercentage: 0, angle: 55, spacing: 0 }  // Verde Escuro
+    { id: 1, value: 0, color: '#ff4e42', fillPercentage: 0, angle: 55, spacing: 6 },
+    { id: 2, value: 0, color: '#ffa500', fillPercentage: 0, angle: 25, spacing: 6 },
+    { id: 3, value: 0, color: '#00ff00', fillPercentage: 0, angle: 25, spacing: 6 },
+    { id: 4, value: 0, color: '#00b050', fillPercentage: 0, angle: 55, spacing: 0 }
   ];
 
   // Parâmetros do círculo
@@ -60,7 +60,6 @@ export class GaugeChartComponent {
   updateChart() {
     const clampedValue = Math.max(0, Math.min(1000, this.currentScore));
 
-    // Atualiza o valor exibido no texto
     this.displayValue = clampedValue;
 
     // Definição dos limites de cada segmento
@@ -72,7 +71,6 @@ export class GaugeChartComponent {
     for (let i = 0; i < this.segments.length; i++) {
       let fillPercentage = 0;
 
-      // Segmento vermelho (0 a 300)
       if (i === 0) {
         const segmentMaxValue = Math.min(clampedValue, thresholdForRed);
         this.segments[i].value = segmentMaxValue;
@@ -83,7 +81,6 @@ export class GaugeChartComponent {
           fillPercentage = (segmentMaxValue / thresholdForRed) * 100;
         }
       } 
-      // Segmento amarelo (301 a 500)
       else if (i === 1) {
         if (clampedValue > thresholdForRed) {
           const excessValue = Math.min(clampedValue - thresholdForRed, thresholdForYellow - thresholdForRed);
@@ -97,7 +94,6 @@ export class GaugeChartComponent {
           fillPercentage = 0;
         }
       } 
-      // Segmento verde claro (501 a 700)
       else if (i === 2) {
         if (clampedValue > thresholdForYellow && clampedValue <= thresholdForFirstGreen) {
           const excessValue = clampedValue - thresholdForYellow;
@@ -111,7 +107,6 @@ export class GaugeChartComponent {
           fillPercentage = 0;
         }
       } 
-      // Segmento verde escuro (701 a 1000)
       else if (i === 3) {
         if (clampedValue > thresholdForFirstGreen) {
           const excessValue = clampedValue - thresholdForFirstGreen;
@@ -125,36 +120,35 @@ export class GaugeChartComponent {
 
       this.segments[i].fillPercentage = fillPercentage;
 
-      // Ajuste de cores conforme o valor ou se o modo cinza escuro estiver ativado
       if (this.segments[i].value > 0) {
-        this.segments[i].color = this.useDarkGrayOutline ? '#A9A9A9' : this.getColor(i); // Cor conforme o segmento normal ou outline cinza escuro
+        this.segments[i].color = this.useDarkGrayOutline ? '#A9A9A9' : this.getColor(i);
       } else {
-        this.segments[i].color = '#d3d3d3'; // Cor para o segmento não preenchido (cinza claro)
+        this.segments[i].color = '#d3d3d3';
       }
     }
   }
   
   getColor(index: number): string {
     if (index === 2 && this.currentScore >= 501) {
-      return '#00ff00'; // Verde Claro
+      return '#00ff00';
     } else if (index === 3 && this.currentScore >= 701) {
-      return '#00b050'; // Verde Escuro
+      return '#00b050';
     } else if (index === 1 && this.currentScore >= 301) {
-      return '#ffa500'; // Amarelo
+      return '#ffa500';
     } else if (index === 0 && this.currentScore <= 300) {
-      return '#ff4e42'; // Vermelho
+      return '#ff4e42';
     } else if (index === 0 && this.currentScore > 300) {
-      return '#ff4e42'; // Vermelho completamente preenchido quando o valor exceder 300
+      return '#ff4e42';
     }
-    return '#d3d3d3'; // Cor padrão para segmentos não preenchidos
+    return '#d3d3d3';
   }
 
   describeArc(startAngle: number, angleSpan: number, radius: number): string {
-    const endAngle = startAngle + angleSpan; // Sentido horário
+    const endAngle = startAngle + angleSpan;
     const start = this.polarToCartesian(0, 0, radius, startAngle);
     const end = this.polarToCartesian(0, 0, radius, endAngle);
     const largeArcFlag = angleSpan > 180 ? 1 : 0;
-    const sweepFlag = 1; // Direção horária
+    const sweepFlag = 1;
 
     const d = [
       'M', start.x, start.y,
@@ -165,7 +159,7 @@ export class GaugeChartComponent {
   }
 
   polarToCartesian(centerX: number, centerY: number, radius: number, angle: number): { x: number, y: number } {
-    const angleRad = (angle) * Math.PI / 180.0; // Usar o ângulo diretamente, sem ajustes
+    const angleRad = (angle) * Math.PI / 180.0;
     return {
       x: centerX + (radius * Math.cos(angleRad)),
       y: centerY + (radius * Math.sin(angleRad))
