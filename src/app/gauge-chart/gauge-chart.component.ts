@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -11,7 +11,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class GaugeChartComponent {
  
-  value: number = 250;
+  @Input() valueScore: number = 250;
   displayValue: number = 250;
 
   segments: Segment[] = [
@@ -50,56 +50,76 @@ export class GaugeChartComponent {
   }
 
   updateChart(s = "") {
-    if (s === 'btn') this.value = Math.round(Math.random() * 1000);
-    const clampedValue = Math.max(0, Math.min(1000, this.value));
+    if (s === 'btn') this.valueScore = Math.round(Math.random() * 1000);
+    const clampedValue = Math.max(0, Math.min(1000, this.valueScore));
   
-    const valuePerSegment = 250; // Cada segmento representa 250 unidades
-    const thresholdForFirstGreen = 651; // Limite para começar a preencher o verde claro
-    const thresholdForLastGreen = 781;  // Novo limite para começar a preencher o verde escuro
+    // Definição dos limites de cada segmento
+    const thresholdForRed = 300;        // Limite para o vermelho (0 a 300)
+    const thresholdForYellow = 500;     // Limite para o amarelo (301 a 500)
+    const thresholdForFirstGreen = 700; // Limite para o verde claro (501 a 700)
+    const thresholdForLastGreen = 1000; // Limite para o verde escuro (701 a 1000)
   
     for (let i = 0; i < this.segments.length; i++) {
-      const segmentValue = clampedValue - (i * valuePerSegment);
       let fillPercentage = 0;
   
-      if (segmentValue >= valuePerSegment) {
-        fillPercentage = 100; // Segmento totalmente preenchido
-      } else if (segmentValue > 0) {
-        fillPercentage = (segmentValue / valuePerSegment) * 100; // Segmento parcialmente preenchido
-      } else {
-        fillPercentage = 0; // Segmento não preenchido
-      }
+      // Segmento vermelho (0 a 300)
+      if (i === 0) {
+        const segmentMaxValue = Math.min(clampedValue, thresholdForRed);
+        this.segments[i].value = segmentMaxValue;
   
-      // Caso especial para o segmento verde claro (índice 2)
-      if (i === 2) {
-        if (clampedValue >= thresholdForFirstGreen) {
-          const excessValue = Math.min(clampedValue - thresholdForFirstGreen, 129); // Preenche até 129 unidades (de 651 a 780)
-          this.segments[i].value = excessValue;
-          this.segments[i].fillPercentage = (excessValue / 129) * 100; // Preencher de 651 a 780
+        if (clampedValue >= thresholdForRed) {
+          // Garante que o vermelho fique totalmente preenchido quando o valor ultrapassa 300
+          this.segments[i].value = thresholdForRed;
+          fillPercentage = 100;
         } else {
-          this.segments[i].value = 0;
-          this.segments[i].fillPercentage = 0;
+          fillPercentage = (segmentMaxValue / thresholdForRed) * 100;
         }
       } 
-      // Caso especial para o segmento verde escuro (índice 3)
-      else if (i === 3) {
-        if (clampedValue >= thresholdForLastGreen) {
-          const excessValue = clampedValue - thresholdForLastGreen;
-          const adjustedValue = Math.min(excessValue, valuePerSegment);
-          
-          // Verde escuro só começa a ser preenchido após o valor 781
-          this.segments[i].value = adjustedValue;
-          this.segments[i].fillPercentage = (adjustedValue / 219) * 100; // Preencher de 781 a 1000 (219 unidades restantes)
+      // Segmento amarelo (301 a 500)
+      else if (i === 1) {
+        if (clampedValue > thresholdForRed) {
+          const excessValue = Math.min(clampedValue - thresholdForRed, thresholdForYellow - thresholdForRed);
+          this.segments[i].value = excessValue;
+          fillPercentage = (excessValue / (thresholdForYellow - thresholdForRed)) * 100;
+        } else if (clampedValue >= thresholdForRed) {
+          // Mantém o preenchimento total do amarelo quando excede o limite anterior
+          this.segments[i].value = thresholdForYellow - thresholdForRed;
+          fillPercentage = 100;
         } else {
           this.segments[i].value = 0;
-          this.segments[i].fillPercentage = 0;
+          fillPercentage = 0;
         }
-      } else {
-        // Preenche normalmente os outros segmentos
-        this.segments[i].value = segmentValue > 0 ? Math.min(segmentValue, valuePerSegment) : 0;
-        this.segments[i].fillPercentage = fillPercentage;
+      } 
+      // Segmento verde claro (501 a 700)
+      else if (i === 2) {
+        if (clampedValue > thresholdForYellow && clampedValue <= thresholdForFirstGreen) {
+          const excessValue = clampedValue - thresholdForYellow;
+          this.segments[i].value = excessValue;
+          fillPercentage = (excessValue / (thresholdForFirstGreen - thresholdForYellow)) * 100;
+        } else if (clampedValue > thresholdForFirstGreen) {
+          // Preenche totalmente o verde claro se o valor exceder 700
+          this.segments[i].value = thresholdForFirstGreen - thresholdForYellow;
+          fillPercentage = 100;
+        } else {
+          this.segments[i].value = 0;
+          fillPercentage = 0;
+        }
+      } 
+      // Segmento verde escuro (701 a 1000)
+      else if (i === 3) {
+        if (clampedValue > thresholdForFirstGreen) {
+          const excessValue = clampedValue - thresholdForFirstGreen;
+          this.segments[i].value = excessValue;
+          fillPercentage = (excessValue / (thresholdForLastGreen - thresholdForFirstGreen)) * 100;
+        } else {
+          this.segments[i].value = 0;
+          fillPercentage = 0;
+        }
       }
   
-      // Mantém a cor original para todos os segmentos preenchidos
+      this.segments[i].fillPercentage = fillPercentage;
+  
+      // Ajuste de cores conforme o valor
       if (this.segments[i].value <= 0) {
         this.segments[i].color = '#d3d3d3'; // Cor para o segmento não preenchido
       } else {
@@ -108,22 +128,31 @@ export class GaugeChartComponent {
     }
   
     // Se estiver usando animação personalizada
-    this.animateValue(this.value, this.displayValue);
+    this.animateValue(this.valueScore, this.displayValue);
   }
   
-
   getColor(index: number): string {
-    if (index === 2 && this.value >= 651) {
+    // Verde claro agora preenche corretamente de 501 a 700
+    if (index === 2 && this.valueScore >= 501) {
       return '#00ff00'; // Verde Claro
-    } else if (index === 3 && this.value >= 751) {
+    } 
+    // Verde escuro preenche corretamente de 701 a 1000
+    else if (index === 3 && this.valueScore >= 701) {
       return '#00b050'; // Verde Escuro
-    } else if (index === 1 && this.value >= 251) {
+    } 
+    // Amarelo preenche de 301 a 500
+    else if (index === 1 && this.valueScore >= 301) {
       return '#ffa500'; // Amarelo
-    } else if (index === 0) {
+    } 
+    // Vermelho preenche de 0 a 300 e permanece preenchido depois de 300
+    else if (index === 0 && this.valueScore <= 300) {
       return '#ff4e42'; // Vermelho
+    } else if (index === 0 && this.valueScore > 300) {
+      return '#ff4e42'; // Vermelho completamente preenchido quando o valor exceder 300
     }
     return '#d3d3d3'; // Cor padrão para segmentos não preenchidos
   }
+  
   
   
   
