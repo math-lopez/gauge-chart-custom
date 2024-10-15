@@ -1,6 +1,5 @@
-<!-- gauge-chart.component.html -->
 <div class="gauge-container">
-  <!-- Slider de entrada -->
+  <!-- Slider de Entrada -->
   <input
     type="range"
     min="0"
@@ -8,44 +7,43 @@
     [(ngModel)]="value"
     (input)="updateChart()"
     class="slider"
+    aria-label="Valor do Gauge"
   />
 
-  <!-- SVG do Gauge Chart Semi-Círculo -->
-  <svg [attr.width]="radius * 2 + 50" [attr.height]="radius + 50">
-    <!-- Círculo de fundo -->
-    <circle
-      [attr.cx]="radius + 25"
-      [attr.cy]="radius + 25"
-      [attr.r]="radius"
-      stroke-width="50"
-      fill="none"
-      stroke="#ddd"
-      [attr.stroke-dasharray]="halfCircumference + ',' + circumference"
-      [attr.transform]="'rotate(180, ' + (radius + 25) + ', ' + (radius + 25) + ')'"
-    />
+  <!-- SVG do Gauge Chart Semi-Círculo com Quatro Segmentos -->
+  <svg [attr.width]="radius * 2 + 50" height="500">
+    <g [attr.transform]="'translate(' + (radius + 25) + ',' + (radius + 25) + ')'">
+      <!-- Desenhar cada segmento -->
+      <ng-container *ngFor="let segment of segments; let i = index">
+        <path
+          [attr.d]="describeArc(
+            (segmentAngle + segmentSpacing) * i + initialOffset,
+            segmentAngle,
+            radius
+          )"
+          [attr.stroke]="segment.color"
+          stroke-width="15"
+          fill="none"
+        ></path>
+      </ng-container>
+    </g>
 
-    <!-- Círculo de progresso -->
-    <circle
-      [attr.cx]="radius + 25"
-      [attr.cy]="radius + 25"
-      [attr.r]="radius"
-      stroke-width="50"
-      fill="none"
-      [attr.stroke]="strokeColor"
-      [attr.stroke-dasharray]="halfCircumference + ',' + circumference"
-      [attr.stroke-dashoffset]="strokeDashoffset"
-      [attr.transform]="'rotate(180, ' + (radius + 25) + ', ' + (radius + 25) + ')'"
-      class="progress-circle"
-    />
-
-    <!-- Texto do valor -->
+    <!-- Texto do Valor -->
     <text
       [attr.x]="radius + 25"
       [attr.y]="radius + 25"
       text-anchor="middle"
       dominant-baseline="middle"
-      [attr.fill]="strokeColor"
-      [style.fontSize.px]="24"
-    >{{ displayText }}</text>
+      [attr.fill]="'#2e3a59'"
+      [style.fontSize.px]="40"
+    >{{ value }}</text>
+    <text
+      [attr.x]="radius + 25"
+      [attr.y]="radius + 50"
+      text-anchor="middle"
+      dominant-baseline="middle"
+      [attr.fill]="'#6c757d'"
+      [style.fontSize.px]="14"
+    >de 1000</text>
   </svg>
 </div>
