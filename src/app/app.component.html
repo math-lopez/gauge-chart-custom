@@ -1,4 +1,5 @@
 <div class="gauge-container">
+  <!-- Slider de Entrada -->
   <input
     type="range"
     min="0"
@@ -9,9 +10,12 @@
     aria-label="Valor do Gauge"
   />
 
+  <!-- SVG do Gauge Chart Semi-Círculo com Quatro Segmentos -->
   <svg [attr.width]="radius * 2 + 100" [attr.height]="radius + 100">
+    <!-- Ajuste o transform para centralizar o gráfico -->
     <g [attr.transform]="'translate(' + (radius + 50) + ',' + (radius + 50) + ')'">
       <ng-container *ngFor="let segment of segments; let i = index">
+        <!-- Caminho de Fundo em Cinza -->
         <path
           [attr.d]="describeArc(
             (segmentAngle + segmentSpacing) * i + initialOffset,
@@ -27,6 +31,7 @@
           stroke-dasharray="100, 100"
         ></path>
 
+        <!-- Caminho de Preenchimento com Cor -->
         <path
           [attr.d]="describeArc(
             (segmentAngle + segmentSpacing) * i + initialOffset,
@@ -44,17 +49,18 @@
       </ng-container>
     </g>
 
+    <!-- Texto do Valor -->
     <text
       [attr.x]="radius + 50"
-      [attr.y]="radius + 30"
+      [attr.y]="radius + 40"
       text-anchor="middle"
       dominant-baseline="middle"
       [attr.fill]="'#2e3a59'"
       [style.fontSize.px]="40"
-    >{{ value }}</text>
+    >{{ displayValue }}</text>
     <text
       [attr.x]="radius + 50"
-      [attr.y]="radius + 60"
+      [attr.y]="radius + 65"
       text-anchor="middle"
       dominant-baseline="middle"
       [attr.fill]="'#6c757d'"
@@ -62,5 +68,6 @@
     >de 1000</text>
   </svg>
 
+  <!-- Botão para Teste (Opcional) -->
   <button (click)="updateChart('btn')">Atualizar Chart</button>
 </div>

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
@@ -10,15 +10,16 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
    
   value: number = 250;
+  displayValue: number = 250; // Valor a ser exibido animadamente
 
   segments: Segment[] = [
-    { id: 1, value: 0, color: '#ddd', fillPercentage: 0 },
-    { id: 2, value: 0, color: '#ddd', fillPercentage: 0 },
-    { id: 3, value: 0, color: '#ddd', fillPercentage: 0 },
-    { id: 4, value: 0, color: '#ddd', fillPercentage: 0 }
+    { id: 1, value: 0, color: '#ff4e42', fillPercentage: 0 }, // Vermelho
+    { id: 2, value: 0, color: '#ffa500', fillPercentage: 0 }, // Amarelo
+    { id: 3, value: 0, color: '#00ff00', fillPercentage: 0 }, // Verde Claro
+    { id: 4, value: 0, color: '#00b050', fillPercentage: 0 }  // Verde Escuro
   ];
 
   // Parâmetros do círculo
@@ -27,10 +28,19 @@ export class AppComponent implements OnInit {
   segmentAngle: number = 38;  // Cada segmento cobre 38 graus
   initialOffset: number = 180; // Começar no lado esquerdo (180 graus)
 
+  private animationFrame!: number;
+
   constructor() { }
 
   ngOnInit(): void {
     this.updateChart();
+    this.animateValue(this.value, this.displayValue);
+  }
+
+  ngOnDestroy(): void {
+    if (this.animationFrame) {
+      cancelAnimationFrame(this.animationFrame);
+    }
   }
 
   updateChart(s = "") {
@@ -63,6 +73,33 @@ export class AppComponent implements OnInit {
         this.segments[i].color = this.getColor(i); // Cor conforme o segmento
       }
     }
+
+    // Iniciar animação do valor
+    this.animateValue(this.value, this.displayValue);
+  }
+
+  animateValue(target: number, current: number, duration: number = 1000) {
+    const startTime = performance.now();
+    const initialValue = this.displayValue;
+    const difference = target - initialValue;
+
+    const step = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      this.displayValue = Math.round(initialValue + difference * this.easeOutCubic(progress));
+
+      if (progress < 1) {
+        this.animationFrame = requestAnimationFrame(step);
+      }
+    };
+
+    cancelAnimationFrame(this.animationFrame);
+    this.animationFrame = requestAnimationFrame(step);
+  }
+
+  // Função de easing (suavização) opcional
+  easeOutCubic(t: number): number {
+    return (--t) * t * t + 1;
   }
 
   getColor(index: number): string {
