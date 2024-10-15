@@ -18,11 +18,11 @@
         <!-- Caminho de Fundo em Cinza -->
         <path
           [attr.d]="describeArc(
-            (segmentAngle + segmentSpacing) * i + initialOffset,
-            segmentAngle,
+            segmentStartAngles[i],
+            segment.angle,
             radius
           )"
-          stroke="#d3d3d3"
+          stroke="#d3d3d3" 
           stroke-width="12"
           stroke-linecap="round"
           fill="none"
@@ -34,8 +34,8 @@
         <!-- Caminho de Preenchimento com Cor -->
         <path
           [attr.d]="describeArc(
-            (segmentAngle + segmentSpacing) * i + initialOffset,
-            segmentAngle,
+            segmentStartAngles[i],
+            segment.angle,
             radius
           )"
           [attr.stroke]="segment.color"

@@ -13,33 +13,40 @@ import { FormsModule } from '@angular/forms';
 export class AppComponent implements OnInit, OnDestroy {
    
   value: number = 250;
-  displayValue: number = 250; // Valor a ser exibido animadamente
+  displayValue: number = 250;
 
   segments: Segment[] = [
-    { id: 1, value: 0, color: '#ff4e42', fillPercentage: 0 }, // Vermelho
-    { id: 2, value: 0, color: '#ffa500', fillPercentage: 0 }, // Amarelo
-    { id: 3, value: 0, color: '#00ff00', fillPercentage: 0 }, // Verde Claro
-    { id: 4, value: 0, color: '#00b050', fillPercentage: 0 }  // Verde Escuro
+    { id: 1, value: 0, color: '#ff4e42', fillPercentage: 0, angle: 46, spacing: 6 }, // Vermelho
+    { id: 2, value: 0, color: '#ffa500', fillPercentage: 0, angle: 35, spacing: 6 }, // Amarelo
+    { id: 3, value: 0, color: '#00ff00', fillPercentage: 0, angle: 35, spacing: 6 }, // Verde Claro
+    { id: 4, value: 0, color: '#00b050', fillPercentage: 0, angle: 46, spacing: 0 }  // Verde Escuro
   ];
 
   // Parâmetros do círculo
   radius: number = 125;
-  segmentSpacing: number = 7; // Espaçamento entre segmentos
-  segmentAngle: number = 38;  // Cada segmento cobre 38 graus
-  initialOffset: number = 180; // Começar no lado esquerdo (180 graus)
+  initialOffset: number = 180;
 
-  private animationFrame!: number;
+  segmentStartAngles: number[] = [];
 
   constructor() { }
 
   ngOnInit(): void {
+    this.calculateSegmentStartAngles();
     this.updateChart();
-    this.animateValue(this.value, this.displayValue);
   }
 
   ngOnDestroy(): void {
     if (this.animationFrame) {
       cancelAnimationFrame(this.animationFrame);
+    }
+  }
+
+  calculateSegmentStartAngles() {
+    this.segmentStartAngles = [];
+    let currentAngle = this.initialOffset;
+    for(let i = 0; i < this.segments.length; i++) {
+      this.segmentStartAngles.push(currentAngle);
+      currentAngle += this.segments[i].angle + this.segments[i].spacing;
     }
   }
 
@@ -74,32 +81,8 @@ export class AppComponent implements OnInit, OnDestroy {
       }
     }
 
-    // Iniciar animação do valor
+    // Se estiver usando animação personalizada
     this.animateValue(this.value, this.displayValue);
-  }
-
-  animateValue(target: number, current: number, duration: number = 1000) {
-    const startTime = performance.now();
-    const initialValue = this.displayValue;
-    const difference = target - initialValue;
-
-    const step = (currentTime: number) => {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      this.displayValue = Math.round(initialValue + difference * this.easeOutCubic(progress));
-
-      if (progress < 1) {
-        this.animationFrame = requestAnimationFrame(step);
-      }
-    };
-
-    cancelAnimationFrame(this.animationFrame);
-    this.animationFrame = requestAnimationFrame(step);
-  }
-
-  // Função de easing (suavização) opcional
-  easeOutCubic(t: number): number {
-    return (--t) * t * t + 1;
   }
 
   getColor(index: number): string {
@@ -129,6 +112,33 @@ export class AppComponent implements OnInit, OnDestroy {
       y: centerY + (radius * Math.sin(angleRad))
     };
   }
+
+  // Animação personalizada do valor (se não estiver usando CountUp.js)
+  animationFrame!: number;
+
+  animateValue(target: number, current: number, duration: number = 1000) {
+    const startTime = performance.now();
+    const initialValue = this.displayValue;
+    const difference = target - initialValue;
+
+    const step = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      this.displayValue = Math.round(initialValue + difference * this.easeOutCubic(progress));
+
+      if (progress < 1) {
+        this.animationFrame = requestAnimationFrame(step);
+      }
+    };
+
+    cancelAnimationFrame(this.animationFrame);
+    this.animationFrame = requestAnimationFrame(step);
+  }
+
+  // Função de easing (suavização) opcional
+  easeOutCubic(t: number): number {
+    return (--t) * t * t + 1;
+  }
 }
 
 // Interface para representar cada segmento
@@ -137,4 +147,6 @@ interface Segment {
   value: number;
   color: string;
   fillPercentage: number; // Percentual de preenchimento (0 a 100)
+  angle: number;          // Ângulo do segmento em graus
+  spacing: number;        // Espaçamento após o segmento em graus
 }
